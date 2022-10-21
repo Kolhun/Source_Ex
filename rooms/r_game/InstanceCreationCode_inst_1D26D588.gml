@@ -1,0 +1,1 @@
+inv_take_add = ITEM.ARMOR_MIDDLE_HEAD
