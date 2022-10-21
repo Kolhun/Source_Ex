@@ -13,6 +13,7 @@
     {"id":{"name":"o_menu","path":"objects/o_menu/o_menu.yy",},"order":0,},
     {"id":{"name":"o_init","path":"objects/o_init/o_init.yy",},"order":5,},
     {"id":{"name":"s_idle","path":"sprites/s_idle/s_idle.yy",},"order":1,},
+    {"id":{"name":"local_note2","path":"notes/local_note2/local_note2.yy",},"order":12,},
     {"id":{"name":"TileSet2","path":"tilesets/TileSet2/TileSet2.yy",},"order":11,},
     {"id":{"name":"o_camera","path":"objects/o_camera/o_camera.yy",},"order":2,},
     {"id":{"name":"local_note","path":"notes/local_note/local_note.yy",},"order":11,},
