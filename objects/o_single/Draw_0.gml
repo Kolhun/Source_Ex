@@ -15,7 +15,7 @@ xx[5] = o_player.x
 yy[5] = o_player.y-26
 
 personality_health = clamp(personality_health,0,personality_health_max)
-
+///*
 draw_set_color(c_black)
 draw_rectangle(xx[5]-40,yy[5]-6,xx[5]+40,yy[5]+6,0)
 draw_set_color(c_white)
