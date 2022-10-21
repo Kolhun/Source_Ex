@@ -41,6 +41,7 @@
     {"id":{"name":"o_translate_controller","path":"objects/o_translate_controller/o_translate_controller.yy",},"order":9,},
     {"id":{"name":"o_input_controller","path":"objects/o_input_controller/o_input_controller.yy",},"order":6,},
     {"id":{"name":"scr_inventory","path":"scripts/scr_inventory/scr_inventory.yy",},"order":0,},
+    {"id":{"name":"NOOOOOTE MORE NOOOTE","path":"notes/NOOOOOTE MORE NOOOTE/NOOOOOTE MORE NOOOTE.yy",},"order":13,},
     {"id":{"name":"Sprite14","path":"sprites/Sprite14/Sprite14.yy",},"order":0,},
     {"id":{"name":"spr_enemy_test_attack","path":"sprites/spr_enemy_test_attack/spr_enemy_test_attack.yy",},"order":14,},
     {"id":{"name":"r_menu","path":"rooms/r_menu/r_menu.yy",},"order":1,},
