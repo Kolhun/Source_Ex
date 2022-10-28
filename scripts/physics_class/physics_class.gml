@@ -1,10 +1,16 @@
 #region Base. 
 
-function physics_system_create() {
+function physics_system_create(_solid) {
 	asset_add_tags(object_index, "physics", asset_object);
 	
 	hsp = 0;
 	vsp = 0;
+	
+	if (_solid) physics_system_mark_as_solid();
+}
+
+function physics_system_mark_as_solid() {
+	asset_add_tags(object_index, "solid", asset_object);
 }
 
 function physics_system_process() {
@@ -19,8 +25,34 @@ function physics_system_process() {
 		y_force += bounce_vsp;
 	}
 	
+	var collided = physics_instance_collision_process(x_force, y_force, o_collider);
+	if (collided.x) x_force = 0;
+	if (collided.y) y_force = 0;
+	
 	x += x_force;
 	y += y_force;
+}
+
+#endregion
+
+#region Collision. 
+
+function physics_instance_collision_process(_force_x, _force_y, _instance) {
+	var collided = {x: false, y: false};
+	
+	if (place_meeting(x + _force_x, y, _instance)) {
+		while(!place_meeting(x + sign(_force_x), y, _instance)) x += sign(_force_x);
+		
+		collided.x = true;
+	}
+	
+	if (place_meeting(x, y + _force_y, _instance)) {
+		while(!place_meeting(x, y + sign(_force_y), _instance)) y += sign(_force_y);
+		
+		collided.y = true;
+	}
+	
+	return collided;
 }
 
 #endregion

@@ -1,0 +1,1 @@
+physics_system_mark_as_solid();
