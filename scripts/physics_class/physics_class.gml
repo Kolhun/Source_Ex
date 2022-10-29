@@ -1,5 +1,14 @@
 #region Base. 
 
+#macro LAYER_TILE_COLLISION layer_get_id("TileCollision")
+#macro TILEMAP_COLLISION_ID layer_tilemap_get_id(LAYER_TILE_COLLISION)
+#macro TILEMAP_COLLISION_TILESET tilemap_get_tileset(TILEMAP_COLLISION_ID)
+#macro TILEMAP_COLLISION_WIDTH tilemap_get_tile_width(TILEMAP_COLLISION_ID)
+#macro TILEMAP_COLLISION_HEIGHT tilemap_get_tile_height(TILEMAP_COLLISION_ID)
+
+global.tilemap_collision_mask_map = ds_map_create();
+global.tilemap_collision_mask_map[? tst_test_collision] = spr_test_collision_tileset_mask;
+
 function physics_system_create(_solid) {
 	asset_add_tags(object_index, "physics", asset_object);
 	
@@ -25,9 +34,12 @@ function physics_system_process() {
 		y_force += bounce_vsp;
 	}
 	
-	var collided = physics_instance_collision_process(x_force, y_force, tag_get_asset_ids(["solid"], asset_object));
-	if (collided.x) x_force = 0;
-	if (collided.y) y_force = 0;
+	var collided_instance, collided_tile;
+	collided_instance = physics_instance_collision_process(x_force, y_force, tag_get_asset_ids(["solid"], asset_object));
+	collided_tile = physics_tile_collision_process(x_force, y_force);
+	
+	if (collided_instance.x || collided_tile.x) x_force = 0;
+	if (collided_instance.y || collided_tile.y) y_force = 0;
 	
 	x += x_force;
 	y += y_force;
@@ -50,6 +62,56 @@ function place_meeting_array(_x, _y, _array) {
 	return collided;
 }
 
+function tile_meeting(_x, _y) {
+	var collided = false;
+	
+	if (!instance_exists(o_tile_collider)) instance_create_depth(0, 0, depth - 1, o_tile_collider);
+	
+	var px, py, ps;
+	px = x;
+	py = y;
+	
+	ps = image_xscale;
+	
+	x = _x;
+	y = _y;
+	
+	image_xscale = 1;
+	
+	var xlen, ylen;
+	xlen = sprite_width / TILEMAP_COLLISION_WIDTH + 1;
+	ylen = sprite_height / TILEMAP_COLLISION_HEIGHT + 1;
+	
+	for(var i = 0; i <= sprite_width; i += sprite_width / xlen) {
+		for(var j = 0; j <= sprite_height; j += sprite_height / ylen) {
+			var xx, yy;
+			xx = ((bbox_left + i) div TILEMAP_COLLISION_WIDTH) * TILEMAP_COLLISION_WIDTH;
+			yy = ((bbox_top + j) div TILEMAP_COLLISION_HEIGHT) * TILEMAP_COLLISION_HEIGHT;
+			
+			with(o_tile_collider) {
+				x = xx;
+				y = yy;
+		
+				sprite_index = global.tilemap_collision_mask_map[? TILEMAP_COLLISION_TILESET];
+				image_index = tilemap_get_at_pixel(TILEMAP_COLLISION_ID, xx, yy);
+			}
+			
+			if (place_meeting(x, y, o_tile_collider)) {
+				collided = true;
+				
+				break;
+			}
+		}
+	}
+	
+	x = px;
+	y = py;
+	
+	image_xscale = ps;
+	
+	return collided;
+}
+
 function physics_instance_collision_process(_force_x, _force_y, _array) {
 	var collided = {x: false, y: false};
 	
@@ -63,6 +125,25 @@ function physics_instance_collision_process(_force_x, _force_y, _array) {
 	var ver = place_meeting_array(x, y + _force_y, _array);
 	if (ver != noone) {
 		while(!place_meeting(x, y + sign(_force_y), ver)) y += sign(_force_y);
+		
+		collided.y = true;
+	}
+	
+	return collided;
+}
+
+function physics_tile_collision_process(_force_x, _force_y) {
+	var collided = {x: false, y: false};
+	if (!layer_exists(LAYER_TILE_COLLISION)) return collided;
+	
+	if (tile_meeting(x + _force_x, y)) {
+		while(!tile_meeting(x + sign(_force_x), y)) x += sign(_force_x);
+		
+		collided.x = true;
+	}
+	
+	if (tile_meeting(x, y + _force_y)) {
+		while(!tile_meeting(x, y + sign(_force_y))) y += sign(_force_y);
 		
 		collided.y = true;
 	}
