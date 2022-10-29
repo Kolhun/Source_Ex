@@ -25,7 +25,7 @@ function physics_system_process() {
 		y_force += bounce_vsp;
 	}
 	
-	var collided = physics_instance_collision_process(x_force, y_force, o_collider);
+	var collided = physics_instance_collision_process(x_force, y_force, tag_get_asset_ids(["solid"], asset_object));
 	if (collided.x) x_force = 0;
 	if (collided.y) y_force = 0;
 	
@@ -37,17 +37,32 @@ function physics_system_process() {
 
 #region Collision. 
 
-function physics_instance_collision_process(_force_x, _force_y, _instance) {
+function place_meeting_array(_x, _y, _array) {
+	var num = array_length(_array), collided = noone;
+	for(var i = 0; i < num; i ++) {
+		if (place_meeting(_x, _y, _array[i])) {
+			collided = instance_place(_x, _y, _array[i]);
+			
+			break;
+		}
+	}
+	
+	return collided;
+}
+
+function physics_instance_collision_process(_force_x, _force_y, _array) {
 	var collided = {x: false, y: false};
 	
-	if (place_meeting(x + _force_x, y, _instance)) {
-		while(!place_meeting(x + sign(_force_x), y, _instance)) x += sign(_force_x);
+	var hor = place_meeting_array(x + _force_x, y, _array);
+	if (hor != noone) {
+		while(!place_meeting(x + sign(_force_x), y, hor)) x += sign(_force_x);
 		
 		collided.x = true;
 	}
 	
-	if (place_meeting(x, y + _force_y, _instance)) {
-		while(!place_meeting(x, y + sign(_force_y), _instance)) y += sign(_force_y);
+	var ver = place_meeting_array(x, y + _force_y, _array);
+	if (ver != noone) {
+		while(!place_meeting(x, y + sign(_force_y), ver)) y += sign(_force_y);
 		
 		collided.y = true;
 	}
